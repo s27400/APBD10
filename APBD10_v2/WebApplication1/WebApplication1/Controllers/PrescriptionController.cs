@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DTOs;
 using WebApplication1.Entities;
 using WebApplication1.Repositories;
-using WebApplication1.Services;
 
 namespace WebApplication1.Controllers;
 
@@ -10,17 +9,17 @@ namespace WebApplication1.Controllers;
 [Route("api/prescriptions")]
 public class PrescriptionController : ControllerBase
 {
-    private readonly IPrescriptionService _prescriptionService;
-
-    public PrescriptionController(IPrescriptionService prescriptionService)
+    private readonly IPrescriptionRepository _prescriptionRepository;
+    
+    public PrescriptionController(IPrescriptionRepository prescriptionRepository)
     {
-        _prescriptionService = prescriptionService;
+        _prescriptionRepository = prescriptionRepository;
     }
 
     [HttpPost]
     public async Task<IActionResult> AddPatientWithPrescription(AddingPrescriptionDTO dto, CancellationToken cancellationToken)
     {
-        string res = await _prescriptionService.AddPatientWithPrescription(dto, cancellationToken);
+        string res = await _prescriptionRepository.AddPatientWithPrescription(dto, cancellationToken);
         if (res.StartsWith("Error"))
         {
             return NotFound(res);

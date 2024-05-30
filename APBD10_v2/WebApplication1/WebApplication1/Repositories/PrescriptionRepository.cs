@@ -122,4 +122,55 @@ public class PrescriptionRepository : IPrescriptionRepository
         return 1;
     }
     
+    public async Task<string> AddPatientWithPrescription(AddingPrescriptionDTO dto, CancellationToken cancellationToken)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            bool patientExists = await PatientExists(dto.Patient.IdPatient, cancellationToken);
+            int PatientId = dto.Patient.IdPatient;
+
+            if (!patientExists)
+            {
+                await AddPatient(dto.Patient, cancellationToken);
+                int newId = await GetAddedPatientId(dto.Patient, cancellationToken);
+                PatientId = newId;
+            }
+
+            dto.Patient.IdPatient = PatientId;
+
+            bool medsExist = await MedicamentsVerification(dto.medicaments, cancellationToken);
+
+            if (!medsExist)
+            {
+                return "Error: Inserted medicaments not exist";
+            }
+
+            bool amount = AmountMeds(dto.medicaments);
+
+            if (!amount)
+            {
+                return "Error: There is more than 10 meds in list";
+            }
+
+            bool dateVal = DateValidation(dto.DueDate, dto.Date);
+
+            if (!dateVal)
+            {
+                return "Error: DueDate < Date";
+            }
+
+            await AddPrescription(dto, cancellationToken);
+            int idPrescription = await GetAddedPrescriptionId(dto, cancellationToken);
+            await AddMedsToPrescription(dto.medicaments, cancellationToken, idPrescription);
+            await transaction.CommitAsync(cancellationToken);
+            return $"Prescription with id {idPrescription} added";
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return "Error: Transaction Error.";
+        }
+    }
+    
 }

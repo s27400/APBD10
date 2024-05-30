@@ -14,4 +14,6 @@ public interface IPrescriptionRepository
     public Task<string> AddPrescription(AddingPrescriptionDTO dto, CancellationToken cancellationToken);
     public Task<int> GetAddedPrescriptionId(AddingPrescriptionDTO dto, CancellationToken cancellationToken);
     public Task<int> AddMedsToPrescription(List<PrescriptionMedsDTO> meds, CancellationToken cancellationToken,  int IdPresc);
+    
+    public Task<string> AddPatientWithPrescription(AddingPrescriptionDTO dto, CancellationToken cancellationToken);
 }

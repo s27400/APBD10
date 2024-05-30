@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Entities;
 using WebApplication1.Repositories;
-using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +11,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
-builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
 
 builder.Services.AddDbContext<HospitalDbContext>(opt =>
 {
