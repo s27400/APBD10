@@ -40,9 +40,8 @@ public class PatientRepository : IPatientRepository
         patientDto.Birthdate = patient.Birthdate;
 
         var presc = _context.Prescriptions
-            .Include(p => p.IdDoctor)
+            .Include(p => p.DoctorNavigation)
             .Include(p => p.PrescriptionMedicaments)
-            .ThenInclude(pm => pm.IdMedication)
             .Where(x => x.IdPatient == PatientId);
 
         var toPatient = await presc
@@ -59,7 +58,12 @@ public class PatientRepository : IPatientRepository
                         Dose = med.Dose,
                         Description = med.MedicamentNavigation.Description
                     }).ToList(),
-                Doctor = 
+                Doctor = new DoctorDTO()
+                {
+                    IdDoctor = prescription.DoctorNavigation.IdDoctor,
+                    FirstName = prescription.DoctorNavigation.FirstName,
+                    LastName = prescription.DoctorNavigation.LastName
+                }
             }).ToListAsync(cancellationToken);
 
         patientDto.Prescriptions = toPatient;
